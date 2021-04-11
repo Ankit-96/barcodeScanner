@@ -18,34 +18,33 @@ class Home extends Component {
       visible: false,
       showModal: false,
       data: {},
+      product: '',
     };
   }
 
-  productDetails = {
-    name: '',
-    phone: '',
-    email: '',
-    picture: '',
-  };
+  // componentDidMount() {
+  //   this.setState({
 
-  async _getData() {
+  //     product: '',
+  //   });
+  // }
+
+  productDetails;
+
+  _getData() {
     let uri, rawData, fetchedData;
 
-    uri = url.replace(barText, '') + this.state.data.data;
+    uri = url.replace(barText, '') + this.state.data;
 
-    fetchedData = await fetch(uri)
+    fetchedData = fetch(uri)
       .then((response) => response.json())
       .then((data) => {
         rawData = data.results;
+        this.info = data.results[1];
+        this.productDetails = data.results[0];
       });
 
-    let keys = Object.keys(this.productDetails);
-    keys.map((item) => {
-      this.productDetails[item] = rawData[0][item];
-    });
-
-    debugger;
-    return [this.productDetails];
+    return this.productDetails;
   }
 
   _renderCamera() {
@@ -59,12 +58,12 @@ class Home extends Component {
         onBarCodeRead={(data) => {
           if (data !== undefined) {
             this.setState({
+              ...this.state,
               showModal: true,
-              data: data,
+              data: data.data,
             });
 
             this._getData();
-            debugger;
           }
         }}>
         {this.state.showModal && this._renderModal()}
@@ -73,32 +72,22 @@ class Home extends Component {
   }
 
   _renderModal() {
-    debugger;
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundcoLOR: 'white',
-          borderTopLeftRadius: 15,
-          borderTopRightRadius: 15,
-        }}>
-        <Modal
-          hasBackdrop={true}
-          backdropColor={'#fff'}
-          hideModalContentWhileAnimating={true}
-          isVisible={this.state.showModal}
-          swipeDirection={'down'}
-          onSwipeComplete={() =>
-            this.setState({
-              showModal: false,
-              visible: !this.state.visible,
-            })
-          }>
-          <Details data={this.productDetails} />
-        </Modal>
-      </View>
+      <Modal
+        hasBackdrop={true}
+        backdropColor={'#000'}
+        hideModalContentWhileAnimating={true}
+        isVisible={this.state.showModal}
+        swipeDirection={'down'}
+        onSwipeComplete={() =>
+          this.setState({
+            ...this.state,
+            showModal: false,
+            visible: !this.state.visible,
+          })
+        }>
+        <Details data={this.productDetails} />
+      </Modal>
     );
   }
 
@@ -121,6 +110,7 @@ class Home extends Component {
             compact
             onPress={() =>
               this.setState({
+                ...this.state,
                 showModal: false,
                 visible: !this.state.visible,
               })
