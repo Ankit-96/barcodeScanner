@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "16.13.1",
     "react-native": "0.63.3",
+    "react-native-barcode-mask": "^1.2.4",
     "react-native-camera": "3.43.3",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-modal": "^11.9.0",

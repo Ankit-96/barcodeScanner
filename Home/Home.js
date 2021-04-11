@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
-import {View} from 'react-native';
+import {View, Image} from 'react-native';
 
 import {Button} from 'react-native-paper';
 import {RNCamera} from 'react-native-camera';
 import Modal from 'react-native-modal';
+import BarcodeMask from 'react-native-barcode-mask';
 
 import Details from './Details';
+import corner from './corners.png';
 
 const barText = 'barcode-number';
 const url = 'https://randomuser.me/api/?seed=%7Bbarcode-number';
@@ -29,7 +31,7 @@ class Home extends Component {
   //   });
   // }
 
-  productDetails;
+  productDetails = {};
 
   _getData() {
     let uri, rawData, fetchedData;
@@ -45,30 +47,6 @@ class Home extends Component {
       });
 
     return this.productDetails;
-  }
-
-  _renderCamera() {
-    return (
-      <RNCamera
-        style={{flex: 1, justifyContent: 'flex-end'}}
-        ref={(ref) => {
-          this.camera = ref;
-        }}
-        type={RNCamera.Constants.Type.back}
-        onBarCodeRead={(data) => {
-          if (data !== undefined) {
-            this.setState({
-              ...this.state,
-              showModal: true,
-              data: data.data,
-            });
-
-            this._getData();
-          }
-        }}>
-        {this.state.showModal && this._renderModal()}
-      </RNCamera>
-    );
   }
 
   _renderModal() {
@@ -88,6 +66,42 @@ class Home extends Component {
         }>
         <Details data={this.productDetails} />
       </Modal>
+    );
+  }
+
+  _renderImage() {
+    return <Image source={corner} />;
+  }
+
+  _renderCamera() {
+    return (
+      <RNCamera
+        style={{flex: 1, justifyContent: 'flex-end'}}
+        ref={(ref) => {
+          this.camera = ref;
+        }}
+        type={RNCamera.Constants.Type.back}
+        onBarCodeRead={(data) => {
+          if (data !== undefined) {
+            this.setState({
+              ...this.state,
+              showModal: true,
+              data: data.data,
+            });
+
+            this._getData();
+          } else {
+            this.setState({
+              ...this.state,
+              showModal: false,
+              visible: false,
+            });
+            alert('Cannot Find Product');
+          }
+        }}>
+        <BarcodeMask />
+        {this.state.showModal && this._renderModal()}
+      </RNCamera>
     );
   }
 
