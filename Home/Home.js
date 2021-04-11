@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
-import {View, Dimensions} from 'react-native';
+import {View} from 'react-native';
+
 import {Button} from 'react-native-paper';
 import {RNCamera} from 'react-native-camera';
-import {Modalize} from 'react-native-modalize';
+import Modal from 'react-native-modal';
+
+import Details from './Details';
 
 const barText = 'barcode-number';
 const url = 'https://randomuser.me/api/?seed=%7Bbarcode-number';
@@ -18,16 +21,15 @@ class Home extends Component {
     };
   }
 
-  modal = React.createRef();
+  productDetails = {
+    name: '',
+    phone: '',
+    email: '',
+    picture: '',
+  };
 
   async _getData() {
     let uri, rawData, fetchedData;
-    let productDetails = {
-      name: '',
-      phone: '',
-      email: '',
-      picture: '',
-    };
 
     uri = url.replace(barText, '') + this.state.data.data;
 
@@ -37,13 +39,13 @@ class Home extends Component {
         rawData = data.results;
       });
 
-    let keys = Object.keys(productDetails);
+    let keys = Object.keys(this.productDetails);
     keys.map((item) => {
-      productDetails[item] = rawData[0][item];
+      this.productDetails[item] = rawData[0][item];
     });
 
     debugger;
-    return [productDetails];
+    return [this.productDetails];
   }
 
   _renderCamera() {
@@ -57,34 +59,45 @@ class Home extends Component {
         onBarCodeRead={(data) => {
           if (data !== undefined) {
             this.setState({
-              visible: !this.state.visible,
               showModal: true,
               data: data,
             });
+
+            this._getData();
+            debugger;
           }
-        }}
-      />
+        }}>
+        {this.state.showModal && this._renderModal()}
+      </RNCamera>
     );
   }
 
-  renderContent(product) {
-    debugger;
-    return <View style={{backgroundColor: 'orange'}} />;
-  }
-
-  async _renderModal() {
-    let productDetails = await this._getData();
-    console.log(productDetails);
-
+  _renderModal() {
     debugger;
     return (
-      <View style={{backgroundColor: 'red'}}>
-        {/* <Modalize
-          ref={this.modal}
-          snapPoint={300}
-          modalHeight={500}
-          // customRenderer={this.renderContent(productDetails)}
-        /> */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundcoLOR: 'white',
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
+        }}>
+        <Modal
+          hasBackdrop={true}
+          backdropColor={'#fff'}
+          hideModalContentWhileAnimating={true}
+          isVisible={this.state.showModal}
+          swipeDirection={'down'}
+          onSwipeComplete={() =>
+            this.setState({
+              showModal: false,
+              visible: !this.state.visible,
+            })
+          }>
+          <Details data={this.productDetails} />
+        </Modal>
       </View>
     );
   }
@@ -97,7 +110,6 @@ class Home extends Component {
           flexDirection: 'column',
           justifyContent: 'center',
         }}>
-        {this.state.showModal && this._renderModal()}
         {this.state.visible && this._renderCamera()}
         {!this.state.visible && (
           <Button
