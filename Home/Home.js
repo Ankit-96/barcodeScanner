@@ -24,15 +24,6 @@ class Home extends Component {
     };
   }
 
-  // componentDidMount() {
-  //   this.setState({
-
-  //     product: '',
-  //   });
-  // }
-
-  productDetails = {};
-
   _getData() {
     let uri, rawData, fetchedData;
 
@@ -42,11 +33,12 @@ class Home extends Component {
       .then((response) => response.json())
       .then((data) => {
         rawData = data.results;
-        this.info = data.results[1];
-        this.productDetails = data.results[0];
+        this.setState({
+          product: data.results[0],
+        });
       });
 
-    return this.productDetails;
+    return;
   }
 
   _renderModal() {
@@ -59,12 +51,11 @@ class Home extends Component {
         swipeDirection={'down'}
         onSwipeComplete={() =>
           this.setState({
-            ...this.state,
             showModal: false,
             visible: !this.state.visible,
           })
         }>
-        <Details data={this.productDetails} />
+        <Details data={this.state.product} />
       </Modal>
     );
   }
@@ -83,16 +74,15 @@ class Home extends Component {
         type={RNCamera.Constants.Type.back}
         onBarCodeRead={(data) => {
           if (data !== undefined) {
-            this.setState({
-              ...this.state,
-              showModal: true,
-              data: data.data,
-            });
-
-            this._getData();
+            this.setState(
+              {
+                showModal: true,
+                data: data.data,
+              },
+              this._getData(),
+            );
           } else {
             this.setState({
-              ...this.state,
               showModal: false,
               visible: false,
             });
@@ -124,7 +114,6 @@ class Home extends Component {
             compact
             onPress={() =>
               this.setState({
-                ...this.state,
                 showModal: false,
                 visible: !this.state.visible,
               })
