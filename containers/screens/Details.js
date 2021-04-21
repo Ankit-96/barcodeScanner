@@ -71,7 +71,9 @@ class Details extends Component {
     debugger
     let { data } = this.props
 
-    return this._fetchData(data)
+    return <View style={{ flex: 1, backgroundColor: 'yellow' }} />
+
+    return this.state.product && this._renderModal()
     // this.state.product !== '' && this._renderModal()
     // let { data } = this.props
 
